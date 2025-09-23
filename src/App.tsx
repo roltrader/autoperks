@@ -1,15 +1,4 @@
-
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/components/theme-provider";
-import Index from "./pages/Index";
-import AdminPage from "./pages/AdminPage";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
+import { AppProvider } from "@/contexts/AppContext"; // ← Make sure this is imported
 
 const App = () => (
   <ThemeProvider defaultTheme="light">
@@ -17,16 +6,16 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppProvider> {/* ← Wrap everything inside here */}
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AppProvider>
       </TooltipProvider>
     </QueryClientProvider>
   </ThemeProvider>
 );
-
-export default App;

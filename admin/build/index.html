@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPerks - Admin Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { background: #dc3545; color: white; padding: 10px 20px; border: none; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #c82333; }
+        .hidden { display: none; }
+        .booking { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .booking.pending { border-left: 5px solid #ffc107; }
+        .booking.confirmed { border-left: 5px solid #28a745; }
+        .booking.completed { border-left: 5px solid #6c757d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .status-select { width: auto; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AutoPerks - Admin Portal</h1>
+        
+        <div id="loginForm">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="admin@autoperks.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="admin123">
+            </div>
+            <button onclick="login()">Login</button>
+            <div id="loginError" style="color: red; margin-top: 10px;"></div>
+        </div>
+        
+        <div id="adminDashboard" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Booking Management</h2>
+                <button onclick="logout()">Logout</button>
+            </div>
+            
+            <div id="bookingsContainer">
+                <p>Loading bookings...</p>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let currentAdmin = null;
+        
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            console.log('Attempting admin login with:', { email, password });
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (response.ok) {
+                    currentAdmin = data.user;
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    loadBookings();
+                    showMessage('Admin login successful!', 'success');
+                    errorDiv.textContent = '';
+                } else {
+                    console.error('Login failed:', data.error);
+                    errorDiv.textContent = data.error || 'Login failed';
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Login failed: ' + error.message;
+                showMessage('Login failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/admin/bookings', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load bookings');
+                }
+                
+                const bookings = await response.json();
+                displayBookings(bookings);
+            } catch (error) {
+                document.getElementById('bookingsContainer').innerHTML = 
+                    '<p style="color: red;">Failed to load bookings: ' + error.message + '</p>';
+            }
+        }
+        
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsContainer');
+            
+            if (bookings.length === 0) {
+                container.innerHTML = '<p>No bookings found.</p>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            bookings.forEach(booking => {
+                html += `
+                    <tr>
+                        <td>${booking.id}</td>
+                        <td>${booking.user ? booking.user.email : 'Unknown'}</td>
+                        <td>${booking.service ? booking.service.name : 'Unknown'} ($${booking.service ? booking.service.price : 0})</td>
+                        <td>${booking.date}</td>
+                        <td>${booking.time}</td>
+                        <td>
+                            <select class="status-select" onchange="updateBookingStatus(${booking.id}, this.value)">
+                                <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="in-progress" ${booking.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button onclick="updateBookingStatus(${booking.id}, 'confirmed')" style="background: #28a745; font-size: 12px; padding: 5px 10px;">Confirm</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        async function updateBookingStatus(bookingId, status) {
+            try {
+                const response = await fetch(`/api/admin/bookings/${bookingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ status })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`Booking ${bookingId} updated to ${status}`, 'success');
+                    loadBookings(); // Refresh the list
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Update failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                currentAdmin = null;
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('adminDashboard').classList.add('hidden');
+                document.getElementById('loginError').textContent = '';
+                showMessage('Logged out successfully', 'success');
+            } catch (error) {
+                showMessage('Logout failed', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.style.color = type === 'error' ? 'red' : 'green';
+            setTimeout(() => messageDiv.textContent = '', 3000);
+        }
+        
+        // Add Enter key support for login
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPerks - Client Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .hidden { display: none; }
+        .booking { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AutoPerks - Book Your Service</h1>
+        
+        <div id="loginForm">
+            <h2>Client Login</h2>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="client@test.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="client123">
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+        
+        <div id="bookingForm" class="hidden">
+            <h2>Book a Service</h2>
+            <div class="form-group">
+                <label>Service:</label>
+                <select id="serviceSelect"></select>
+            </div>
+            <div class="form-group">
+                <label>Date:</label>
+                <input type="date" id="date">
+            </div>
+            <div class="form-group">
+                <label>Time:</label>
+                <input type="time" id="time">
+            </div>
+            <button onclick="bookService()">Book Service</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/client/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('bookingForm').classList.remove('hidden');
+                    loadServices();
+                    showMessage('Login successful!', 'success');
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Login failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const services = await response.json();
+                
+                const select = document.getElementById('serviceSelect');
+                select.innerHTML = '';
+                services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.textContent = `${service.name} - $${service.price} (${service.duration}min)`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showMessage('Failed to load services', 'error');
+            }
+        }
+        
+        async function bookService() {
+            const serviceId = document.getElementById('serviceSelect').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            
+            if (!serviceId || !date || !time) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ serviceId: parseInt(serviceId), date, time })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Booking created successfully!', 'success');
+                    document.getElementById('date').value = '';
+                    document.getElementById('time').value = '';
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Booking failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                currentUser = null;
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('bookingForm').classList.add('hidden');
+                showMessage('Logged out successfully', 'success');
+            } catch (error) {
+                showMessage('Logout failed', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.style.color = type === 'error' ? 'red' : 'green';
+            setTimeout(() => messageDiv.textContent = '', 3000);
+        }
+        
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('date').value = tomorrow.toISOString().split('T')[0];
+    </script>
+</body>
+</html>

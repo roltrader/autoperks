@@ -17,5 +17,8 @@ logs/
 *~
 cookies.txt
 dist/
-build/
 coverage/
+# Allow client and admin build directories (they contain our static HTML)
+build/
+!client/build/
+!admin/build/

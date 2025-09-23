@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "client": "cd client && npm start",
-    "admin": "cd admin && npm start",
+    "build:client": "cd client && vite build",
+    "build:admin": "cd admin && vite build",
+    "dev:client": "cd client && vite",
+    "dev:admin": "cd admin && vite",
     "test": "jest",
     "lint": "eslint src/"
   },
@@ -20,13 +22,21 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
     "express-session": "^1.17.3",
-    "connect-mongo": "^5.0.0"
+    "connect-mongo": "^5.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "axios": "^1.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
     "jest": "^29.6.4",
     "eslint": "^8.48.0",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "@vitejs/plugin-react": "^4.0.4",
+    "vite": "^4.4.9",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7"
   },
   "keywords": ["automotive", "booking", "services", "admin", "client"],
   "author": "AutoPerks Team",

@@ -3,13 +3,18 @@
 ## 🎯 Quick 3-Step Process
 
 ### Step 1: Copy the Schema
-**Option A: From GitHub (Recommended)**
-1. Go to: https://github.com/roltrader/autoperks/blob/main/supabase/schema.sql
+**Option A: Use the Fixed Version (Recommended)**
+1. Go to: `QUICK_FIX_COPY_PASTE.md` in your repository
+2. Copy the entire SQL block (no permission errors!)
+3. This version removes the problematic JWT secret line
+
+**Option B: From GitHub Fixed File**
+1. Go to: https://github.com/roltrader/autoperks/blob/main/supabase/schema_fixed.sql
 2. Click the **"Copy raw file"** button (📋 icon)
 3. The entire file is now copied to your clipboard
 
-**Option B: From Your Local Files**
-1. Open `supabase/schema.sql` in any text editor
+**Option C: From Your Local Files**
+1. Open `supabase/schema_fixed.sql` in any text editor
 2. Select all (Ctrl+A or Cmd+A)
 3. Copy (Ctrl+C or Cmd+C)
 
@@ -43,7 +48,12 @@
 
 ## 🚨 Common Issues & Quick Fixes
 
-### Issue 1: "Table already exists"
+### Issue 1: "permission denied to set parameter app.jwt_secret"
+**Solution**: Use the fixed schema from `QUICK_FIX_COPY_PASTE.md` or `supabase/schema_fixed.sql`
+- This removes the problematic JWT secret line
+- Your app will work perfectly without it
+
+### Issue 2: "Table already exists"
 **Solution**: Run this first to clear existing tables:
 ```sql
 DROP TABLE IF EXISTS public.bookings CASCADE;

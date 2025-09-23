@@ -1,21 +1,9 @@
-# 🚀 QUICK FIX: Copy This Schema (No Permission Errors)
+-- AutoPerks Database Schema - CLEAN VERSION (no markdown formatting)
+-- Copy everything from this line down to the end
 
-## ✅ Problem Solved: Use This Corrected Schema
-
-The JWT permission error is fixed! **Copy and paste this entire corrected schema:**
-
----
-
-## 📋 COPY THIS ENTIRE BLOCK (No backticks!):
-
-**⚠️ IMPORTANT: Copy only the SQL code below, NOT the ```sql formatting!**
--- ✅ FIXED VERSION: AutoPerks Database Schema (no permission errors)
-
--- Create custom types
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled');
 CREATE TYPE user_role AS ENUM ('client', 'admin', 'technician');
 
--- Users table (extends auth.users)
 CREATE TABLE public.users (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
@@ -26,7 +14,6 @@ CREATE TABLE public.users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Services table
 CREATE TABLE public.services (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -38,7 +25,6 @@ CREATE TABLE public.services (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Technicians table
 CREATE TABLE public.technicians (
   id SERIAL PRIMARY KEY,
   user_id UUID REFERENCES public.users(id),
@@ -51,7 +37,6 @@ CREATE TABLE public.technicians (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Bookings table
 CREATE TABLE public.bookings (
   id SERIAL PRIMARY KEY,
   user_id UUID REFERENCES public.users(id) NOT NULL,
@@ -66,7 +51,6 @@ CREATE TABLE public.bookings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert default services
 INSERT INTO public.services (name, description, price, duration) VALUES
 ('Car Wash', 'Professional exterior and interior cleaning', 25.00, 30),
 ('Full Detail', 'Complete vehicle detailing service including wash, wax, and interior deep clean', 150.00, 180),
@@ -74,28 +58,22 @@ INSERT INTO public.services (name, description, price, duration) VALUES
 ('Tire Rotation', 'Professional tire rotation and pressure check', 35.00, 30),
 ('Brake Inspection', 'Complete brake system inspection and basic maintenance', 75.00, 60);
 
--- Enable Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.technicians ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 
--- Users policies
 CREATE POLICY "Users can read own data" ON public.users FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own data" ON public.users FOR UPDATE USING (auth.uid() = id);
 
--- Services policies
 CREATE POLICY "Services are readable by authenticated users" ON public.services FOR SELECT TO authenticated USING (true);
 
--- Technicians policies
 CREATE POLICY "Technicians are readable by authenticated users" ON public.technicians FOR SELECT TO authenticated USING (true);
 
--- Bookings policies
 CREATE POLICY "Users can read own bookings" ON public.bookings FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can create own bookings" ON public.bookings FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own bookings" ON public.bookings FOR UPDATE USING (auth.uid() = user_id);
 
--- Admin policies
 CREATE POLICY "Admins can read all bookings" ON public.bookings FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM public.users 
@@ -110,7 +88,6 @@ CREATE POLICY "Admins can update all bookings" ON public.bookings FOR UPDATE USI
   )
 );
 
--- Functions and triggers
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -124,7 +101,6 @@ CREATE TRIGGER update_services_updated_at BEFORE UPDATE ON public.services FOR E
 CREATE TRIGGER update_technicians_updated_at BEFORE UPDATE ON public.technicians FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON public.bookings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- New user handler
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -143,63 +119,4 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Success message
 SELECT 'Schema applied successfully! Your AutoPerks database is ready.' as status;
-
----
-
-## 🎯 How to Use This:
-
-### **Step 1**: Copy the entire block above
-- Select all the SQL code
-- Copy it (Ctrl+C or Cmd+C)
-
-### **Step 2**: Go to Supabase SQL Editor
-- Open your "autoperks" project
-- Click "SQL Editor" → "New Query"
-
-### **Step 3**: Paste and Run
-- Paste the code (Ctrl+V or Cmd+V)
-- Click "Run"
-- Wait for success message
-
-## ✅ What You Should See:
-
-**Success indicators:**
-- ✅ **Green success message**
-- ✅ **"Schema applied successfully!" message**
-- ✅ **No red permission errors**
-- ✅ **4 new tables in Table Editor**
-
-**Verify it worked:**
-```sql
-SELECT COUNT(*) FROM public.services;
-```
-Should return: **5**
-
-## 🚀 After Success:
-
-1. **✅ Schema is applied** - no more errors!
-2. **✅ Deploy to Vercel** with your Supabase credentials
-3. **✅ Test your Next.js app**
-4. **✅ "useApp must be used within AppProvider" error resolved!**
-
-## 🔧 If You Still Get Errors:
-
-**"Table already exists"?**
-Run this first:
-```sql
-DROP TABLE IF EXISTS public.bookings CASCADE;
-DROP TABLE IF EXISTS public.services CASCADE;
-DROP TABLE IF EXISTS public.technicians CASCADE;
-DROP TABLE IF EXISTS public.users CASCADE;
-```
-
-**"syntax error at or near ```"?**
-You copied markdown formatting! Use `COPY_PASTE_MISTAKE_FIX.md` for the fix.
-
-**Other issues?** Check `TROUBLESHOOTING_SQL.md`
-
----
-
-**This corrected schema will work without any permission errors!** 🎉

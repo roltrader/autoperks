@@ -9,18 +9,28 @@
 
 ## 🗄️ Supabase Setup (Do This First)
 
-### 1. Create Supabase Project
-- [ ] Go to [supabase.com](https://supabase.com)
-- [ ] Create new project named "autoperks"
-- [ ] Save your database password
+### 1. Use Your Existing Project ✅
+- [x] You already have "autoperks" project in Supabase
+- [ ] Go to your existing project dashboard
 
-### 2. Apply Database Schema
+### 2. Check Current Database Structure
 - [ ] Go to SQL Editor in Supabase
-- [ ] Copy contents from `supabase/schema.sql`
-- [ ] Run the SQL to create tables and policies
+- [ ] Run the query from `supabase/check_existing.sql`
+- [ ] See what tables/data you currently have
 
-### 3. Get Credentials
-- [ ] Go to Settings → API
+### 3. Update Database Schema
+Choose one option:
+
+**Option A: Keep Existing Data (Recommended)**
+- [ ] Run `supabase/minimal_update.sql` in SQL Editor
+- [ ] This adds new tables without affecting existing data
+
+**Option B: Fresh Start**
+- [ ] Run complete `supabase/schema.sql` 
+- [ ] ⚠️ This will replace all existing tables
+
+### 4. Get Your Existing Credentials
+- [ ] Go to Settings → API in your existing project
 - [ ] Copy Project URL: `https://xxxxx.supabase.co`
 - [ ] Copy Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
 

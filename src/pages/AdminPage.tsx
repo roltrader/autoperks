@@ -1,4 +1,3 @@
-import { AppProvider } from '@/contexts/AppContext';
 import { useState } from "react";
 import AdminLogin from "@/components/AdminLogin";
 import UnifiedManagementDashboard from "@/components/UnifiedManagementDashboard";
@@ -18,14 +17,10 @@ const AdminPage = () => {
     setIsAdminLoggedIn(false);
   };
 
-  return (
-    <AppProvider>
-      {isAdminLoggedIn ? (
-        <UnifiedManagementDashboard onLogout={handleAdminLogout} />
-      ) : (
-        <AdminLogin onLogin={handleAdminLogin} />
-      )}
-    </AppProvider>
+  return isAdminLoggedIn ? (
+    <UnifiedManagementDashboard onLogout={handleAdminLogout} />
+  ) : (
+    <AdminLogin onLogin={handleAdminLogin} />
   );
 };
 

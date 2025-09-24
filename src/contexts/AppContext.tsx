@@ -232,7 +232,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 export function useApp() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useApp must be used within AppProvider');
+    console.warn("❌ useApp called outside AppProvider");
+    throw new Error("useApp must be used within AppProvider");
   }
+  console.log("✅ useApp accessed inside AppProvider");
   return context;
 }

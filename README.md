@@ -1,98 +1,172 @@
-# ITV Booking System
+# AutoPerks - Automotive Services Booking System
 
-A professional booking and management system for ITV (Inspección Técnica de Vehículos) services, featuring calendar scheduling, technician management, and administrative controls.
+A modern automotive services booking system built with Next.js, Supabase, and Vercel.
 
-## 🚀 Quick Start
+## 🚀 Features
+
+- **Client Portal**: Book automotive services with ease
+- **Admin Dashboard**: Manage bookings and technicians
+- **Real-time Updates**: Live booking status updates
+- **Secure Authentication**: Supabase Auth with role-based access
+- **Responsive Design**: Works on all devices
+- **Modern Stack**: Next.js 14, React 18, Tailwind CSS
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 14, React 18, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Deployment**: Vercel
+- **Authentication**: Supabase Auth with RLS
+- **Styling**: Tailwind CSS
+
+## 🧰 Setup Instructions
+
+### 1. Clone the Repository
 
 ```bash
-# Install dependencies
+git clone https://github.com/roltrader/autoperks.git
+cd autoperks
+```
+
+### 2. Install Dependencies
+
+```bash
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
 ```
 
-## 💼 Features
+### 3. Set up Supabase
 
-### Customer Features
-- **Online Booking Calendar** - Easy appointment scheduling
-- **Service Selection** - Choose from maintenance, ITV testing, and valet services
-- **Multi-language Support** - Spanish and English interfaces
-- **Mobile Responsive** - Works on all devices
-- **Real-time Availability** - Live calendar updates
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to Settings > API to get your project URL and anon key
+3. Go to SQL Editor and run the schema from `supabase/schema.sql`
 
-### Business Features
-- **Admin Portal** - Complete booking management
-- **Technician Scheduling** - Staff assignment and workload management
-- **Corporate Bookings** - Special forms for company clients
-- **Notification System** - Automated reminders and updates
-- **Analytics Dashboard** - Track bookings and performance
+### 4. Environment Variables
 
-## 🛠️ Technology Stack
+Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
 
-- **Frontend**: React 18 + TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Routing**: React Router v6
-- **State Management**: React Context API
-- **Database Ready**: Supabase integration prepared
-- **Build Tool**: Vite
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
-## 📦 Installation
+### 5. Run Development Server
 
-1. Clone or download the repository
-2. Install Node.js 18+ if not already installed
-3. Run `npm install` in the project directory
-4. Start with `npm run dev`
-
-## 🌐 Deployment
-
-### Netlify (Easiest)
-1. Build project: `npm run build`
-2. Drag `dist` folder to Netlify
-
-### Vercel
 ```bash
-npm i -g vercel
-vercel
+npm run dev
 ```
 
-### Traditional Hosting
-Upload `dist` folder contents to your web server
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 📱 Screenshots
+## 🚀 Deployment to Vercel
 
-- Calendar booking interface
-- Admin management dashboard
-- Technician scheduling grid
-- Mobile responsive design
+### 1. Connect to Vercel
 
-## 🔧 Configuration
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
 
-### Environment Variables (Optional)
-Create `.env` file for database:
+### 2. Environment Variables in Vercel
+
+Add these environment variables in your Vercel project settings:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 3. Deploy
+
+Vercel will automatically deploy your application on every push to main branch.
+
+## 🔐 Authentication & Roles
+
+The application supports two user roles:
+
+- **Client**: Can book services and view their bookings
+- **Admin**: Can manage all bookings and view analytics
+
+### Creating Admin Users
+
+To create an admin user, sign up normally and then update the user's role in Supabase:
+
+```sql
+UPDATE public.users 
+SET role = 'admin' 
+WHERE email = 'admin@example.com';
 ```
-VITE_SUPABASE_URL=your_url
-VITE_SUPABASE_ANON_KEY=your_key
+
+## 📱 Application Structure
+
+```
+app/
+├── layout.js              # Root layout with AppProvider
+├── page.js                # Home page
+├── auth/
+│   ├── login/page.js      # Client login
+│   └── admin-login/page.js # Admin login
+├── dashboard/page.js      # Client dashboard
+└── admin/page.js          # Admin dashboard
+
+components/
+└── providers/
+    └── AppProvider.jsx    # Main context provider
+
+lib/
+├── supabase.js           # Supabase client
+└── auth.js               # Authentication helpers
 ```
 
-### Customization
-- Colors: Edit `tailwind.config.ts`
-- Services: Modify `src/components/ServicesGrid.tsx`
-- Prices: Update service components
+## 🐛 Troubleshooting
 
-## 📞 Support
+### "useApp must be used within AppProvider" Error
 
-**Powered by Roltrader Consultancy Group**
-- Tel: +34 977 320 682
-- Mobile: 699 25 15 88
+This error occurs when components try to use the `useApp` hook outside of the `AppProvider` context. 
+
+**Solution**: Ensure your root layout (`app/layout.js`) wraps all content with `<AppProvider>`:
+
+```jsx
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <AppProvider>
+          {children}
+        </AppProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+### Database Connection Issues
+
+1. Check your Supabase URL and keys in environment variables
+2. Ensure Row Level Security policies are set up correctly
+3. Verify the database schema is applied
+
+### Deployment Issues
+
+1. Ensure all environment variables are set in Vercel
+2. Check build logs for any missing dependencies
+3. Verify Supabase project is accessible from Vercel
+
+## 📊 Database Schema
+
+The application uses the following main tables:
+
+- `users` - User profiles and roles
+- `services` - Available automotive services
+- `bookings` - Service bookings
+- `technicians` - Service technicians
+
+See `supabase/schema.sql` for the complete schema.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
-Proprietary software - All rights reserved
-
----
-
-Built with ❤️ for professional ITV services
+This project is licensed under the MIT License.

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -71,3 +72,29 @@ Desktop.ini
 *.temp
 .cache/
 .vercel
+=======
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+logs/
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+cookies.txt
+dist/
+coverage/
+# Allow client and admin build directories (they contain our static HTML)
+build/
+!client/build/
+!admin/build/
+>>>>>>> 4d90fc7036fa130a4ca5e39e3ec8affe37dd2de9

@@ -66,6 +66,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   console.log("✅ AppProvider mounted");
 
+
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedAddons, setSelectedAddons] = useState<any[]>([]);
   
@@ -238,3 +239,4 @@ export function useApp() {
   console.log("✅ useApp accessed inside AppProvider");
   return context;
 }
+

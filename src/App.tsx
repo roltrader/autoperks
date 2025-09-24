@@ -20,3 +20,5 @@ const App = () => (
   </ThemeProvider>
 );
 // Trigger redeploy
+console.log("Redeploy triggered");
+

@@ -170,3 +170,4 @@ See `supabase/schema.sql` for the complete schema.
 ## 📄 License
 
 This project is licensed under the MIT License.
+<!-- Trigger redeploy -->
